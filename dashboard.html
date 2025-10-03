@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP31 Grants Dashboard - Cuevasm's Input</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+        }
+
+        .issues-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .issue-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .issue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .issue-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .issue-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a202c;
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-awarded {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-in-review {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .issue-number {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .issue-date {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .cuevasm-section {
+            padding: 1.5rem;
+            background: #f0f9ff;
+            border-top: 3px solid #0ea5e9;
+        }
+
+        .cuevasm-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cuevasm-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .cuevasm-title {
+            font-weight: 600;
+            color: #0c4a6e;
+        }
+
+        .cuevasm-comments {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .cuevasm-comment {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #0ea5e9;
+        }
+
+        .comment-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .comment-body {
+            line-height: 1.6;
+        }
+
+        .no-cuevasm {
+            padding: 1.5rem;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .issue-meta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SIP31 Grants Dashboard</h1>
+            <p>Focus on Cuevasm's Input - The Decision Maker</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-issues">-</div>
+                <div class="stat-label">Total Issues</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-comments">-</div>
+                <div class="stat-label">Cuevasm Comments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="awarded-count">-</div>
+                <div class="stat-label">Awarded</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-count">-</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="search-box" id="search" placeholder="Search issues, comments, or applicants...">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="awarded">Awarded</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="in-review">In Review</button>
+                <button class="filter-btn" data-filter="has-cuevasm">Has Cuevasm</button>
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="loading">Loading SIP31 grants data...</div>
+        </div>
+    </div>
+
+    <script>
+        let allIssues = [];
+        let filteredIssues = [];
+        let currentFilter = 'all';
+
+        // Load data
+        async function loadData() {
+            try {
+                const response = await fetch('web_app_data.json');
+                const data = await response.json();
+                
+                allIssues = data.issues;
+                filteredIssues = allIssues;
+                
+                updateStats(data.summary);
+                renderIssues();
+                
+                document.getElementById('content').innerHTML = '';
+            } catch (error) {
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        Error loading data: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Update statistics
+        function updateStats(summary) {
+            document.getElementById('total-issues').textContent = summary.total_issues;
+            document.getElementById('total-comments').textContent = summary.total_cuevasm_comments;
+            document.getElementById('awarded-count').textContent = summary.awarded_count;
+            document.getElementById('pending-count').textContent = summary.pending_count;
+        }
+
+        // Filter issues
+        function filterIssues(filter) {
+            currentFilter = filter;
+            
+            filteredIssues = allIssues.filter(issue => {
+                switch(filter) {
+                    case 'awarded':
+                        return issue.decision_status === 'approved';
+                    case 'pending':
+                        return issue.decision_status === 'pending';
+                    case 'in-review':
+                        return issue.decision_status === 'in_review';
+                    case 'has-cuevasm':
+                        return issue.has_cuevasm_comments;
+                    default:
+                        return true;
+                }
+            });
+            
+            renderIssues();
+        }
+
+        // Search issues
+        function searchIssues(searchTerm) {
+            if (!searchTerm.trim()) {
+                filteredIssues = allIssues;
+            } else {
+                const term = searchTerm.toLowerCase();
+                filteredIssues = allIssues.filter(issue => {
+                    return issue.title.toLowerCase().includes(term) ||
+                           issue.body.toLowerCase().includes(term) ||
+                           issue.cuevasm_comments.some(comment => 
+                               comment.body.toLowerCase().includes(term)
+                           );
+                });
+            }
+            
+            renderIssues();
+        }
+
+        // Render issues
+        function renderIssues() {
+            const content = document.getElementById('content');
+            
+            if (filteredIssues.length === 0) {
+                content.innerHTML = '<div class="no-cuevasm">No issues found matching your criteria.</div>';
+                return;
+            }
+
+            const issuesHtml = filteredIssues.map(issue => `
+                <div class="issue-card">
+                    <div class="issue-header">
+                        <div class="issue-title">${escapeHtml(issue.title)}</div>
+                        <div class="issue-meta">
+                            <span class="issue-number">#${issue.number}</span>
+                            <span class="status-badge status-${issue.decision_status === 'approved' ? 'awarded' : issue.decision_status.replace('_', '-')}">
+                                ${issue.status_badge.text}
+                            </span>
+                            <span class="issue-date">${issue.created_at_formatted}</span>
+                        </div>
+                    </div>
+                    
+                    ${issue.has_cuevasm_comments ? `
+                        <div class="cuevasm-section">
+                            <div class="cuevasm-header">
+                                <div class="cuevasm-avatar">C</div>
+                                <div class="cuevasm-title">
+                                    Cuevasm's Input (${issue.cuevasm_comment_count} comment${issue.cuevasm_comment_count > 1 ? 's' : ''})
+                                </div>
+                            </div>
+                            <div class="cuevasm-comments">
+                                ${issue.cuevasm_comments.map(comment => `
+                                    <div class="cuevasm-comment">
+                                        <div class="comment-meta">
+                                            <span>${comment.created_at_formatted}</span>
+                                            <a href="${comment.html_url}" target="_blank" style="color: #0ea5e9; text-decoration: none;">
+                                                View on GitHub →
+                                            </a>
+                                        </div>
+                                        <div class="comment-body">${comment.body_html}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="no-cuevasm">
+                            No input from Cuevasm yet
+                        </div>
+                    `}
+                </div>
+            `).join('');
+
+            content.innerHTML = `<div class="issues-grid">${issuesHtml}</div>`;
+        }
+
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterIssues(btn.dataset.filter);
+                });
+            });
+            
+            // Search box
+            document.getElementById('search').addEventListener('input', (e) => {
+                searchIssues(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
