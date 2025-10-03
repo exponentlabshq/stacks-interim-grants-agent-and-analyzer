@@ -33,13 +33,13 @@ Assistant: [Cuevasm's skeptical evaluation]
 
 ### View the Dashboard
 
-Open `dashboard.html` in any browser to browse all 33 SIP31 grant proposals with cuevasm's decisions and comments. No installation required.
+Open `index.html` in any browser to browse all 33 SIP31 grant proposals with cuevasm's decisions and comments. No installation required.
 
 ## 📊 Project Files
 
 ### Core Deliverables
 - **`cuevasm-system-prompt.md`** - The AI system prompt (main output)
-- **`dashboard.html`** - Interactive grant viewer (open in browser)
+- **`index.html`** - Interactive grant viewer (open in browser)
 - **`web_app_data.json`** - Processed data (33 issues, 92 cuevasm comments)
 
 ### Data Extraction Scripts
@@ -93,7 +93,7 @@ The AI uses a weighted scoring system:
 4. Submit grant proposals for evaluation
 
 ### View Grant Data
-1. Open `dashboard.html` in any browser
+1. Open `index.html` in any browser
 2. Search, filter, and browse all 33 grant proposals
 3. Read cuevasm's comments and decisions
 
